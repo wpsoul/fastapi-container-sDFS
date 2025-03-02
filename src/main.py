@@ -14,3 +14,7 @@ agent = Agent(
 async def ask(query: str):
     response = agent.run(query)
     return {"response": response.content}
+
+@app.get("/healthz/")
+def health_check_endpoint():
+    return {"status": "ok"}
