@@ -1,20 +1,16 @@
-from typing import Union
-
 from fastapi import FastAPI
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
 
 app = FastAPI()
 
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    description="You are a helpful assistant.",
+    markdown=True,
+)
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.get("/healthz/")
-def health_check_endpoint():
-    return {"status": "ok"}
+@app.get("/ask")
+async def ask(query: str):
+    response = agent.run(query)
+    return {"response": response.content}
