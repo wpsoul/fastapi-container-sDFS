@@ -7,3 +7,7 @@ pypdf
 psycopg[binary]
 sqlalchemy
 uvicorn
+duckduckgo-search
+newspaper4k
+lxml_html_clean
+python-dotenv
