@@ -1,10 +1,14 @@
 from textwrap import dedent
+from typing import Iterator
 from fastapi import FastAPI
 from agno.agent import Agent
+from agno.agent.run_response import RunResponse
 from agno.models.openai import OpenAIChat
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.newspaper4k import Newspaper4kTools
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+import json
 
 app = FastAPI()
 
@@ -27,7 +31,7 @@ agent = Agent(
     description=dedent("""
         You are an expert search agent that queries the site greenshiftwp.com using DuckDuckGo.
         Based on the user's request, you attempt to find relevant links on the site.
-        If no results are found, you respond with 'sorry, I have no results'.
+        If no results are found, you respond with 'I was unable to find any results on Greenshift Documentation. Please write to support.'.
         If links are found, ensure they are returned at the end of your response.
         Additionally, extract content from the top two relevant links to provide deeper insights.
     """),
@@ -62,6 +66,32 @@ agent = Agent(
 async def ask(query: str):
     response = agent.run(query)
     return {"response": response.content}
+
+@app.get("/ask-with-stream")
+async def ask_with_stream(query: str):
+    # Run agent and return the response as a stream
+    response_stream: Iterator[RunResponse] = agent.run(query, stream=True)
+    
+    def generate():
+        for chunk in response_stream:
+            # Each chunk is a RunResponse object
+            # Format as Server-Sent Event
+            if chunk.content is not None:
+                data = {
+                    "content": chunk.content,
+                    "type": "content"
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+            
+            # If there's tool call information and show_tool_calls is enabled
+            if hasattr(chunk, "tool_calls") and chunk.tool_calls:
+                data = {
+                    "tool_calls": chunk.tool_calls,
+                    "type": "tool_calls"
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 @app.get("/healthz/")
 def health_check_endpoint():
