@@ -1,8 +1,7 @@
 from textwrap import dedent
 from typing import Iterator
 from fastapi import FastAPI
-from agno.agent import Agent
-from agno.agent.run_response import RunResponse
+from agno.agent import Agent, RunResponse
 from agno.models.openai import OpenAIChat
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.newspaper4k import Newspaper4kTools
