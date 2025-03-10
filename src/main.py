@@ -75,7 +75,13 @@ async def ask_with_stream(query: str):
         for chunk in response_stream:
             # Each chunk is a RunResponse object
             # Format as Server-Sent Event
-            yield f"data: {json.dumps(chunk)}\n\n"
+            data = {
+                "content": chunk.content,
+                "type": "content",
+                "chunk": chunk
+            }
+            yield f"data: {json.dumps(data)}\n\n"
+
             
     
     return StreamingResponse(generate(), media_type="text/event-stream")
