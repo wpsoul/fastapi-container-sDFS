@@ -57,9 +57,27 @@ agent = Agent(
     """),
     markdown=True,
     add_datetime_to_instructions=True,
-    show_tool_calls=False
+    show_tool_calls=True
 )
 
+# Helper function to make objects JSON serializable
+def make_serializable(obj):
+    """Convert non-serializable objects to serializable form."""
+    if hasattr(obj, '__dict__'):
+        return {k: make_serializable(v) for k, v in obj.__dict__.items() 
+                if not k.startswith('_')}
+    elif isinstance(obj, (list, tuple)):
+        return [make_serializable(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {k: make_serializable(v) for k, v in obj.items()}
+    else:
+        try:
+            # Try standard JSON serialization
+            json.dumps(obj)
+            return obj
+        except (TypeError, OverflowError):
+            # If not serializable, convert to string representation
+            return str(obj)
 
 @app.get("/ask")
 async def ask(query: str):
@@ -73,21 +91,22 @@ async def ask_with_stream(query: str):
     
     def generate():
         for chunk in response_stream:
-
-            # If there's tool call information and show_tool_calls is enabled
-            if hasattr(chunk, "tools") and chunk.tools:
-                data = {
-                    "tools": chunk.tools,
-                    "type": "tools"
-                }
-                yield f"data: {json.dumps(data)}\n\n"
-
             # Each chunk is a RunResponse object
             # Format as Server-Sent Event
             if chunk.content is not None:
                 data = {
                     "content": chunk.content,
                     "type": "content"
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+            
+            # If there's tool call information and show_tool_calls is enabled
+            if hasattr(chunk, "tools") and chunk.tools:
+                # Convert tools to JSON serializable format
+                serializable_tools = make_serializable(chunk.tools)
+                data = {
+                    "tools": serializable_tools,
+                    "type": "tools"
                 }
                 yield f"data: {json.dumps(data)}\n\n"
     
