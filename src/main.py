@@ -57,7 +57,8 @@ agent = Agent(
     """),
     markdown=True,
     add_datetime_to_instructions=True,
-    show_tool_calls=True,
+    show_tool_calls=False,
+    use_tools=True
 )
 
 
@@ -66,7 +67,6 @@ async def ask(query: str):
     response = agent.run(query)
     return {"response": response.content}
 
-
 @app.get("/ask-with-stream")
 async def ask_with_stream(query: str):
     # Run agent and return the response as a stream
@@ -74,16 +74,23 @@ async def ask_with_stream(query: str):
     
     def generate():
         for chunk in response_stream:
+
+            # If there's tool call information and show_tool_calls is enabled
+            if hasattr(chunk, "tools") and chunk.tools:
+                data = {
+                    "tools": chunk.tools,
+                    "type": "tools"
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+
             # Each chunk is a RunResponse object
             # Format as Server-Sent Event
-            data = {
-                "content": chunk.content,
-                "type": "content",
-                "chunk": chunk
-            }
-            yield f"data: {json.dumps(data)}\n\n"
-
-            
+            if chunk.content is not None:
+                data = {
+                    "content": chunk.content,
+                    "type": "content"
+                }
+                yield f"data: {json.dumps(data)}\n\n"
     
     return StreamingResponse(generate(), media_type="text/event-stream")
 
