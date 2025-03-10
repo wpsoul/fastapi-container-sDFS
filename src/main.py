@@ -69,7 +69,7 @@ async def ask(query: str):
 @app.get("/ask-with-stream")
 async def ask_with_stream(query: str):
     # Run agent and return the response as a stream
-    response_stream: Iterator[RunResponse] = agent.run(query, stream=True)
+    response_stream: Iterator[RunResponse] = agent.run(query, stream=True, show_tool_calls=True)
     
     def generate():
         for chunk in response_stream:
@@ -83,10 +83,10 @@ async def ask_with_stream(query: str):
                 yield f"data: {json.dumps(data)}\n\n"
             
             # If there's tool call information and show_tool_calls is enabled
-            if hasattr(chunk, "tool_calls") and chunk.tool_calls:
+            if hasattr(chunk, "tools") and chunk.tools:
                 data = {
-                    "tool_calls": chunk.tool_calls,
-                    "type": "tool_calls"
+                    "tools": chunk.tools,
+                    "type": "tools"
                 }
                 yield f"data: {json.dumps(data)}\n\n"
     
