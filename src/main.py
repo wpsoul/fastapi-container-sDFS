@@ -66,6 +66,7 @@ async def ask(query: str):
     response = agent.run(query)
     return {"response": response.content}
 
+
 @app.get("/ask-with-stream")
 async def ask_with_stream(query: str):
     # Run agent and return the response as a stream
