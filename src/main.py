@@ -75,20 +75,8 @@ async def ask_with_stream(query: str):
         for chunk in response_stream:
             # Each chunk is a RunResponse object
             # Format as Server-Sent Event
-            if chunk.content is not None:
-                data = {
-                    "content": chunk.content,
-                    "type": "content"
-                }
-                yield f"data: {json.dumps(data)}\n\n"
+            yield f"data: {json.dumps(chunk)}\n\n"
             
-            # If there's tool call information and show_tool_calls is enabled
-            if hasattr(chunk, "tools") and chunk.tools:
-                data = {
-                    "tools": chunk.tools,
-                    "type": "tools"
-                }
-                yield f"data: {json.dumps(data)}\n\n"
     
     return StreamingResponse(generate(), media_type="text/event-stream")
 
