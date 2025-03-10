@@ -57,8 +57,7 @@ agent = Agent(
     """),
     markdown=True,
     add_datetime_to_instructions=True,
-    show_tool_calls=False,
-    use_tools=True
+    show_tool_calls=False
 )
 
 
