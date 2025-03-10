@@ -57,7 +57,7 @@ agent = Agent(
     """),
     markdown=True,
     add_datetime_to_instructions=True,
-    show_tool_calls=False,
+    show_tool_calls=True,
 )
 
 
@@ -69,7 +69,7 @@ async def ask(query: str):
 @app.get("/ask-with-stream")
 async def ask_with_stream(query: str):
     # Run agent and return the response as a stream
-    response_stream: Iterator[RunResponse] = agent.run(query, stream=True, show_tool_calls=True)
+    response_stream: Iterator[RunResponse] = agent.run(query, stream=True)
     
     def generate():
         for chunk in response_stream:
