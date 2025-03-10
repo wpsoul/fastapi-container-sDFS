@@ -90,23 +90,28 @@ async def ask_with_stream(query: str):
     response_stream: Iterator[RunResponse] = agent.run(query, stream=True)
     
     def generate():
+        # Add a flag to track if we've already sent the tools data
+        tools_sent = False
+        
         for chunk in response_stream:
+            # If there's tool call information and we haven't sent it yet
+            if hasattr(chunk, "tools") and chunk.tools and not tools_sent:
+                # Convert tools to JSON serializable format
+                serializable_tools = make_serializable(chunk.tools)
+                data = {
+                    "tools": serializable_tools,
+                    "type": "tools"
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+                # Mark that we've sent the tools data
+                tools_sent = True
+            
             # Each chunk is a RunResponse object
             # Format as Server-Sent Event
             if chunk.content is not None:
                 data = {
                     "content": chunk.content,
                     "type": "content"
-                }
-                yield f"data: {json.dumps(data)}\n\n"
-            
-            # If there's tool call information and show_tool_calls is enabled
-            if hasattr(chunk, "tools") and chunk.tools:
-                # Convert tools to JSON serializable format
-                serializable_tools = make_serializable(chunk.tools)
-                data = {
-                    "tools": serializable_tools,
-                    "type": "tools"
                 }
                 yield f"data: {json.dumps(data)}\n\n"
     
