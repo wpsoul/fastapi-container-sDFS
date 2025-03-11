@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from agno.agent import Agent, RunResponse
 from agno.models.openai import OpenAIChat
 from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.googlesearch import GoogleSearchTools
 from agno.tools.newspaper4k import Newspaper4kTools
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -23,12 +24,12 @@ app.add_middleware(
 agent = Agent(
     name="GreenShiftSearchAgent",
     tools=[
-        DuckDuckGoTools(modifier="site:greenshiftwp.com"),  # Search only on greenshiftwp.com
+        GoogleSearchTools(),  # Search only on greenshiftwp.com
         Newspaper4kTools(),  # For extracting content from the links
     ],
     model=OpenAIChat(id="gpt-4o-mini"),  # Using gpt-4o-mini for better performance
     description=dedent("""
-        You are an expert search agent that queries the site greenshiftwp.com using DuckDuckGo.
+        You are an expert search agent that queries the site greenshiftwp.com using Google Search Tool.
         Based on the user's request, you attempt to find relevant links on the site.
         If no results are found, you respond with 'I was unable to find any results on Greenshift Documentation. Please write to support.'.
         If links are found, ensure they are returned at the end of your response.
@@ -38,7 +39,7 @@ agent = Agent(
         Follow these steps for each search request:
 
         1. Search Phase 🔍
-           - Use DuckDuckGo to search the site greenshiftwp.com based on the user's query.
+           - Use GoogleSearchTools to search the site greenshiftwp.com based on the user's query.
            - Check if any links are available after the search.
            - Filter to the top two most relevant links.
 
