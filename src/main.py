@@ -57,7 +57,7 @@ agent = Agent(
     """),
     markdown=True,
     add_datetime_to_instructions=True,
-    show_tool_calls=True
+    show_tool_calls=False
 )
 
 # Helper function to make objects JSON serializable
