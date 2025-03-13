@@ -15,7 +15,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://wp-test.local"],  # Allows specific origin
+    allow_origins=["http://wp-test.local", "https://shop.greenshiftwp.com", "https://greenshiftwp.com"],  # Allows specific origin
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
