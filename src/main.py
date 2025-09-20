@@ -41,7 +41,7 @@ agent = Agent(
 
         3. Response Process 📄
            - If no results are found, respond with 'sorry, I have no results'.
-           - If links are found, ensure they are included at the end of your response.
+           - If links are found, ensure they are included at the end of your response. Links should be returned in the format: [Link Title](Link URL).
 
         Remember:
         - Only search the site greenshiftwp.com
