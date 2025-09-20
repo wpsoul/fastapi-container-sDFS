@@ -94,6 +94,23 @@ async def ask_with_stream(query: str):
         tools_sent = False
         
         for chunk in response_stream:
+            # DEBUG: Print all available attributes and values in the chunk
+            print("=== CHUNK DEBUG INFO ===")
+            print(f"Chunk type: {type(chunk)}")
+            print(f"Chunk dir: {dir(chunk)}")
+            
+            # Print all attributes and their values
+            for attr in dir(chunk):
+                if not attr.startswith('_'):
+                    try:
+                        value = getattr(chunk, attr)
+                        print(f"{attr}: {value} (type: {type(value)})")
+                    except Exception as e:
+                        print(f"{attr}: <Error getting value: {e}>")
+            
+            print(f"Event: {chunk.event}")
+            print("=== END CHUNK DEBUG ===\n")
+            
             # If there's tool call information and we haven't sent it yet
             if chunk.event == "ToolCallStarted":
                 # Convert tools to JSON serializable format
