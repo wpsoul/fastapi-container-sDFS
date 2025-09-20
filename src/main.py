@@ -49,7 +49,6 @@ agent = Agent(
         - Extract and utilize content from the top two links for deeper answers.
     """),
     markdown=True,
-    show_tool_calls=False,
     add_history_to_context=True,
     add_datetime_to_context=True,
     num_history_sessions=3
