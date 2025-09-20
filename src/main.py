@@ -41,12 +41,14 @@ agent = Agent(
 
         3. Response Process 📄
            - If no results are found, respond with 'sorry, I have no results'.
-           - If links are found, ensure they are included at the end of your response. Links should be returned in the format: [Link Title](Link URL).
+           - If links are found, ensure they are included at the end of your response. Links should be returned in the format: [Link Title](Full URL including https://).
+           - Always use the complete URL path, not just the domain name.
 
         Remember:
         - Only search the site greenshiftwp.com
         - Return links if available, otherwise provide a no results message.
         - Extract and utilize content from the top two links for deeper answers.
+        - Always include the full URL path in markdown links, not just the domain.
     """),
     markdown=True,
     add_history_to_context=True,
