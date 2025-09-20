@@ -1,7 +1,7 @@
 from textwrap import dedent
 from typing import Iterator
 from fastapi import FastAPI
-from agno.agent import Agent, RunResponse
+from agno.agent import Agent, RunOutputEvent
 from agno.models.openai import OpenAIResponses
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -82,7 +82,7 @@ async def ask(query: str):
 @app.get("/ask-with-stream")
 async def ask_with_stream(query: str):
     # Run agent and return the response as a stream
-    response_stream: Iterator[RunResponse] = agent.run(query, stream=True)
+    response_stream: Iterator[RunOutputEvent] = agent.run(query, stream=True)
     
     def generate():
         # Add a flag to track if we've already sent the tools data
