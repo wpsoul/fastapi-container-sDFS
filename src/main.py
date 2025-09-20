@@ -21,7 +21,6 @@ app.add_middleware(
 agent = Agent(
     model=OpenAIResponses(id="gpt-5-mini"),
     tools=[{"type": "web_search_preview"}],
-    instructions="Save the results to a file with a relevant name.",
     description=dedent("""
         You are an expert search agent that queries the site greenshiftwp.com.
         Based on the user's request, you attempt to find relevant links on the site.
