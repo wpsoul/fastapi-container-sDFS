@@ -95,7 +95,7 @@ async def ask_with_stream(query: str):
         
         for chunk in response_stream:
             # If there's tool call information and we haven't sent it yet
-            if hasattr(chunk, "tools") and chunk.tools and not tools_sent:
+            if chunk.event == "ToolCallStarted":
                 # Convert tools to JSON serializable format
                 serializable_tools = make_serializable(chunk.tools)
                 data = {
